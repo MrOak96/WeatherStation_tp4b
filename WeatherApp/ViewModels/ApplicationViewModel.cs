@@ -69,6 +69,7 @@ namespace WeatherApp.ViewModels
 
             /// TODO 01 : ConfigurationViewModel Add Configuration ViewModel
 
+            ViewModels.Add(new ConfigurationViewModel());
 
             CurrentViewModel = ViewModels[0];
         }
