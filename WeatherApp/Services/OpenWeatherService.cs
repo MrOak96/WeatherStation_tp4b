@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using WeatherApp.ViewModels;
 
 namespace WeatherApp.Services
@@ -20,14 +21,22 @@ namespace WeatherApp.Services
         public async Task<TemperatureModel> GetTempAsync()
         {
             var temp = await owp.GetCurrentWeatherAsync();
+            TemperatureModel tm = new TemperatureModel();
 
-            var result = new TemperatureModel
+            if (temp.Cod == 401)
+                MessageBox.Show("Clé invalide !");
+            else if (temp.Cod == 404)
+                MessageBox.Show("Ville introuvable !");
+            else
             {
-                DateTime = DateTime.UnixEpoch.AddSeconds(temp.DateTime),
-                Temperature = temp.Main.Temperature
-            };
+                tm = new TemperatureModel
+                {
+                    DateTime = DateTime.UnixEpoch.AddSeconds(temp.DateTime),
+                    Temperature = temp.Main.Temperature
+                };
+            }
 
-            return result;
+            return tm;
         }
 
         public void SetLocation(string location)

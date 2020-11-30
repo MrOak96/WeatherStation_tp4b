@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenWeatherAPI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using WeatherApp.Commands;
@@ -48,8 +49,8 @@ namespace WeatherApp.ViewModels
             ChangePageCommand = new DelegateCommand<string>(ChangePage);
            
             /// TODO 11 : Commenter cette ligne lorsque la configuration utilisateur fonctionne
-            var apiKey = AppConfiguration.GetValue("OWApiKey");
-            ows = new OpenWeatherService(apiKey);
+            //var apiKey = AppConfiguration.GetValue("OWApiKey");
+            //ows = new OpenWeatherService(apiKey);
 
             initViewModels();
         }
@@ -63,7 +64,15 @@ namespace WeatherApp.ViewModels
 
             /// TODO 09 : Indiquer qu'il n'y a aucune clé si le Settings apiKey est vide.
             /// S'il y a une valeur, instancié OpenWeatherService avec la clé
-                
+
+            if (string.IsNullOrEmpty(Properties.Settings.Default.apiKey))
+                tvm.RawText = "Aucune clé API";
+            else
+            {
+                ows = new OpenWeatherService(Properties.Settings.Default.apiKey);
+                tvm.City = OpenWeatherProcessor.Instance.City;
+            }
+
             tvm.SetTemperatureService(ows);
             ViewModels.Add(tvm);
 
@@ -85,7 +94,15 @@ namespace WeatherApp.ViewModels
             ///   Si le service de temperature est null
             ///     Assigner le service de température
             /// 
-           
+
+            if (CurrentViewModel.Name == "ConfigurationViewModel")
+            {
+                ows.SetApiKey((CurrentViewModel as ConfigurationViewModel).ApiKey);
+                TemperatureViewModel tvm = (TemperatureViewModel)ViewModels.FirstOrDefault(x => x.Name == "TemperatureViewModel");
+
+                if (tvm.TemperatureService == null)
+                    tvm.SetTemperatureService(ows);
+            }
 
             /// Permet de retrouver le ViewModel avec le nom indiqé
             CurrentViewModel = ViewModels.FirstOrDefault(x => x.Name == pageName);  
